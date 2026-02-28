@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  index.html — Progressive Competitive Class | Avijit Samanta
+  ============================================================
+  PROJECT  : PCC Website — West Bengal Premier Coaching
+  AUTHOR   : Avijit Samanta
+  VERSION  : v6
+
+  FILE STRUCTURE
+  ─────────────────────────────────────────────────────────────
+  This project is split into 3 files. All 3 MUST stay in the
+  same folder for the website to function correctly:
+
+    index.html  ← You are here. Semantic HTML structure only.
+    style.css   ← All styling (25 organised sections, commented).
+    script.js   ← All interactivity (23 organised sections, commented).
+
+  HOW FILES ARE CONNECTED
+  ─────────────────────────────────────────────────────────────
+  ① style.css is linked in <head> via:
+       <link rel="stylesheet" href="style.css"/>
+
+  ② script.js is loaded at the bottom of <body> via:
+       <script src="script.js"></script>
+     (Placed at the bottom so all DOM elements exist before JS runs.)
+
+  EXTERNAL CDN DEPENDENCIES (loaded in <head>)
+  ─────────────────────────────────────────────────────────────
+  • Google Fonts  — Syne (headings), DM Sans (body), Noto Sans Bengali
+  • Font Awesome 6.5.0 — all icons used throughout the page
+  • GSAP 3.12.5   — hero entrance animation (§15 of script.js)
+  • ScrollTrigger — GSAP scroll plugin (§15 of script.js)
+  • Three.js r128 — WebGL hero particle field (§2 of script.js)
+
+  HTML SECTIONS
+  ─────────────────────────────────────────────────────────────
+  1. <head>         — Meta, title, font/icon links, CDN scripts
+  2. Cursor         — #cur (dot) + #cur-r (ring) — driven by script.js §8
+  3. Mobile Menu    — #mobMenu overlay — driven by script.js §11
+  4. <nav>          — Fixed top navbar — driven by script.js §10
+  5. SVG Defs       — Inline torus distortion filter — driven by script.js §3
+  6. #hero          — Full viewport hero with 3D carousel
+  7. .overlap-bridge — 4 stat cards between hero and about
+  8. #about         — Educator story + drag slider + timeline
+  9. #courses       — 6-card course grid
+  10. #why          — Features grid + animated stats band
+  11. #pdfs         — PDF resource cards with glow effect
+  12. #ratings      — Rating summary + testimonials + review form
+  13. #contact      — Enquiry form + contact information
+  14. <footer>      — Logo + links + social icons
+  15. <script>      — src="script.js" (deferred bottom-load)
+  ============================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Progressive Competitive Class by Avijit Samanta — Premier SSC, State & PSC coaching in West Bengal."/>
+  <title>Progressive Competitive Class | Avijit Samanta</title>
+
+  <!-- ══════════════════════════════════════════════════════════
+       GOOGLE FONTS
+       Syne      → --fd  display/headings font     (style.css :root)
+       DM Sans   → --fb  body copy font            (style.css :root)
+       Noto Sans Bengali → --fbn  Bengali tagline  (style.css :root)
+  ══════════════════════════════════════════════════════════ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- ══════════════════════════════════════════════════════════
+       FONT AWESOME 6.5.0
+       Provides all icons used via <i class="fa fa-*"> elements.
+       Used across: navbar, hero, bridge, courses, features,
+       contact, footer, review form.
+  ══════════════════════════════════════════════════════════ -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <!-- ══════════════════════════════════════════════════════════
+       GSAP 3.12.5 + ScrollTrigger
+       Used by script.js §15 for the hero entrance animation.
+       Must be loaded BEFORE script.js (bottom of body).
+  ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- ══════════════════════════════════════════════════════════
+       THREE.JS r128
+       Used by script.js §2 for the WebGL hero particle field.
+       Must be loaded BEFORE script.js (bottom of body).
+  ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- ══════════════════════════════════════════════════════════
+       PROJECT STYLESHEET
+       Links to style.css in the same folder.
+       Contains all design tokens, component styles & responsive rules.
+  ══════════════════════════════════════════════════════════ -->
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     CUSTOM CURSOR
+     Two-part cursor: small teal dot + larger trailing ring.
+     Styled in style.css §4. Animated in script.js §8.
+     Hidden on touch devices via media query (hover: none).
+══════════════════════════════════════════════════════════ -->
+<div id="cur"></div>
+<div id="cur-r"></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MOBILE MENU OVERLAY
+     Full-screen nav overlay for screens ≤900px.
+     Opened by hamburger button → oM() in script.js §11.
+     Closed by X button or nav link click → cM() in script.js §11.
+     Styled in style.css §16.
+══════════════════════════════════════════════════════════ -->
+<div class="mob-menu" id="mobMenu">
+  <a href="#hero"    onclick="cM()">Home</a>
+  <a href="#about"   onclick="cM()">About</a>
+  <a href="#courses" onclick="cM()">Courses</a>
+  <a href="#why"     onclick="cM()">Why Us</a>
+  <a href="#pdfs"    onclick="cM()">Resources</a>
+  <a href="#ratings" onclick="cM()">Reviews</a>
+  <a href="#contact" onclick="cM()">Contact</a>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     NAVBAR
+     Fixed top navigation bar.
+     .scrolled class added by script.js §10 on scroll > 60px.
+     Styled in style.css §5.
+══════════════════════════════════════════════════════════ -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">
+    <img src="/Assets/logo.png" alt="Logo" class="site-logo">PCC<span>&nbsp;|&nbsp;</span>Avijit Samanta
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#courses">Courses</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#pdfs">Resources</a></li>
+    <li><a href="#ratings">Reviews</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Enroll Now</a>
+  <!-- Hamburger appears at ≤900px — triggers oM() in script.js §11 -->
+  <button class="hamburger" id="hamBtn" onclick="oM()"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════
+     SVG FILTER DEFINITIONS — TORUS DISTORTION
+     This hidden SVG defines the #torus-hero-filter used to create
+     a subtle refraction/distortion effect on the hero heading.
+     The feTurbulence baseFrequency and feDisplacementMap scale
+     are updated every frame by script.js §3 (initTorusDistortion).
+     CSS applies the filter via .torus-filter-active class (style.css §22).
+══════════════════════════════════════════════════════════ -->
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
+  <defs>
+    <filter id="torus-hero-filter" x="-5%" y="-5%" width="110%" height="110%">
+      <!-- Noise layer: animated baseFrequency driven by mouse in script.js §3 -->
+      <feTurbulence id="heroTurbulence" type="fractalNoise" baseFrequency="0.012 0.018"
+        numOctaves="3" seed="5" stitchTiles="stitch" result="noise"/>
+      <!-- Displacement map: scale driven by mouse ring proximity in script.js §3 -->
+      <feDisplacementMap in="SourceGraphic" in2="noise"
+        id="heroDisplace" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 1 — HERO
+     Full-viewport opening section.
+     Contains:
+     • #hero-threejs-canvas — Three.js WebGL particle field (script.js §2)
+     • #hero-canvas         — CSS 2D fallback particles (script.js §5)
+     • .hero-dots           — Dot grid pattern (style.css §7)
+     • .hero-shape-1/2      — Radial blob shapes (style.css §7)
+     • .hero-inner          — 2-column grid: left content + right carousel
+     • #heroCarousel        — 3D CSS depth carousel (script.js §6)
+     • .hero-float-card     — Two floating animated stat cards (style.css §7)
+     • .scroll-hint         — Animated scroll indicator (style.css §7)
+     Styled in style.css §7, §17, §22.
+══════════════════════════════════════════════════════════ -->
+<section id="hero">
+  <!-- Three.js WebGL Canvas — scoped to hero only -->
+  <canvas id="hero-threejs-canvas"></canvas>
+  <!-- CSS 2D fallback canvas — used when WebGL unavailable -->
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-dots"></div>
+  <div class="hero-shape-1"></div>
+  <div class="hero-shape-2"></div>
+
+  <div class="hero-inner">
+
+    <!-- ── HERO LEFT — Main content ── -->
+    <div class="hero-left">
+      <!-- Eyebrow pill badge — animated in by GSAP (script.js §15) -->
+      <div class="hero-eyebrow" id="hEye">
+        <div class="blink"></div>West Bengal's Premier Competitive Coaching
+      </div>
+
+      <!-- Main heading — torus distortion filter applied here (script.js §3) -->
+      <h1 class="hero-title" id="hTitle">
+        PROGRESSIVE<br/>
+        <span class="t-teal">COMPETITIVE</span><br/>
+        <span class="t-line">CLASSES</span><!-- .t-line gets orange underline animation (style.css §7) -->
+      </h1>
+
+      <!-- Bengali tagline — Noto Sans Bengali font (--fbn) -->
+      <p class="hero-tagline-bn" id="hBn">"এক ধাপ এগিয়ে, প্রতিযোগিতার দৌড়ে"</p>
+      <!-- English translation -->
+      <p class="hero-tagline-en" id="hEn">"To ease your fight, must take <strong>our guide</strong>"</p>
+      <!-- Descriptive paragraph -->
+      <p class="hero-tagline-main" id="hEnMain">Master the craft, conquer the challenge. Your roadmap to professional excellence starts here.</p>
+
+      <!-- CTA buttons — ripple effect on click (script.js §16) -->
+      <div class="hero-ctas" id="hCtas">
+        <a href="#courses" class="btn-primary"><i class="fa fa-rocket"></i> Explore Courses</a>
+        <a href="#contact" class="btn-outline"><i class="fa fa-phone"></i> Get In Touch</a>
+      </div>
+
+      <!-- Mini stats bar — static display values -->
+      <div class="hero-mini-stats" id="hStats">
+        <div class="hms"><div class="hms-num">1000+</div><div class="hms-lbl">Students Trained</div></div>
+        <div class="hms"><div class="hms-num">95%</div><div class="hms-lbl">Success Rate</div></div>
+        <div class="hms"><div class="hms-num">10+</div><div class="hms-lbl">Years Teaching</div></div>
+        <div class="hms"><div class="hms-num">500+</div><div class="hms-lbl">Govt. Selections</div></div>
+      </div>
+    </div><!-- /hero-left -->
+
+    <!-- ── HERO RIGHT — 3D Depth Carousel ── -->
+    <div class="hero-right">
+      <video class="hero-bg-video" autoplay muted loop playsinline>
+        <source src="assets/hero-bg.mp4" type="video/mp4">
+      </video>
+      <!-- Offer Wall — replaces hfc-1 — auto-scrolling notices & offers -->
+      <div class="hero-float-card hfc-1 offer-wall" id="offerWall">
+        <div class="ow-hdr">
+          <span class="ow-pulse"></span>
+          <span class="ow-htitle">Offers &amp; Notices</span>
+          <span class="ow-live">LIVE</span>
+        </div>
+        <div class="ow-body">
+          <ul class="ow-list" id="owList">
+            <li class="ow-item ow-offer"><span>🔥</span><div><strong>Diwali Special</strong><p>30% OFF on all courses — Limited seats!</p></div></li>
+            <li class="ow-item ow-notice"><span>📢</span><div><strong>New Batch — 1 Feb</strong><p>SSC CGL morning &amp; evening batches</p></div></li>
+            <li class="ow-item ow-price"><span>💰</span><div><strong>SSC Full Package</strong><p>₹2,999/mo · ₹7,499/3 months</p></div></li>
+            <li class="ow-item ow-notice"><span>⏰</span><div><strong>Batch Timings</strong><p>7AM–9AM &amp; 6PM–8PM daily</p></div></li>
+            <li class="ow-item ow-offer"><span>🎯</span><div><strong>Free Mock Test</strong><p>Every Sunday 10AM — open to all</p></div></li>
+            <li class="ow-item ow-price"><span>📚</span><div><strong>WB State Exams</strong><p>₹1,999/mo · WBP · WBPSC · Group C&amp;D</p></div></li>
+            <li class="ow-item ow-notice"><span>🏆</span><div><strong>Result Update</strong><p>42 students cleared SSC CGL 2024!</p></div></li>
+            <li class="ow-item ow-offer"><span>💡</span><div><strong>Refer &amp; Earn</strong><p>₹500 off for every friend enrolled</p></div></li>
+            <li class="ow-item ow-price"><span>🚆</span><div><strong>Railway &amp; Banking</strong><p>₹1,499/mo · RRB NTPC · ALP</p></div></li>
+            <li class="ow-item ow-notice"><span>📝</span><div><strong>Monthly CA PDF</strong><p>Current Affairs — FREE every month</p></div></li>
+          </ul>
+        </div>
+        <a href="#contact" class="ow-cta">Enroll &amp; Claim Offer →</a>
+      </div>
+
+      <!-- 3D Carousel Stage — JS logic in script.js §6 -->
+      <div class="hero-carousel-stage" id="heroCarousel">
+        <!-- Peek-a-boo overlay — cursor-following hole (script.js §4) -->
+        <div id="hero-peek-overlay"></div>
+
+        <!-- Slide 1 — Teal gradient -->
+        <div class="hc-slide hc-s1 active">
+          <span class="hero-vis-bg-text">PCC</span>
+          <div class="hc-slide-icon"><i class="fa fa-graduation-cap"></i></div>
+          <h3>Transform Your Future</h3>
+          <p>Expert guidance for SSC, State &amp; PSC exams by Avijit Samanta</p>
+        </div>
+        <!-- Slide 2 — Dark blue gradient -->
+        <div class="hc-slide hc-s2">
+          <span class="hero-vis-bg-text">SSC</span>
+          <div class="hc-slide-icon"><i class="fa fa-shield-halved"></i></div>
+          <h3>SSC Mastery</h3>
+          <p>CGL, CHSL, MTS, CPO — every tier covered with precision strategy</p>
+        </div>
+        <!-- Slide 3 — Purple gradient -->
+        <div class="hc-slide hc-s3">
+          <span class="hero-vis-bg-text">WBP</span>
+          <div class="hc-slide-icon"><i class="fa fa-map-location-dot"></i></div>
+          <h3>Bengal's Best Prep</h3>
+          <p>State-specific GK, WBP, WBPSC and PSC — tailored for West Bengal</p>
+        </div>
+        <!-- Slide 4 — Orange gradient -->
+        <div class="hc-slide hc-s4">
+          <span class="hero-vis-bg-text">500+</span>
+          <div class="hc-slide-icon"><i class="fa fa-trophy"></i></div>
+          <h3>500+ Selections</h3>
+          <p>A proven track record turning aspirants into government officers</p>
+        </div>
+        <!-- Slide 5 — Dark slate gradient -->
+        <div class="hc-slide hc-s5">
+          <span class="hero-vis-bg-text">95%</span>
+          <div class="hc-slide-icon"><i class="fa fa-chart-line"></i></div>
+          <h3>95% Success Rate</h3>
+          <p>Industry-leading results built on disciplined teaching since 2013</p>
+        </div>
+
+        <!-- Dot indicators — injected dynamically by script.js §6 -->
+        <div class="hc-dots" id="hcDots"></div>
+      </div><!-- /heroCarousel -->
+
+      <!-- Floating stat card 2 — counter animated by script.js §14 -->
+      <div class="hero-float-card hfc-2">
+        <div class="hfc-label">Success Rate</div>
+        <div class="hfc-val" style="color:var(--teal)" id="hfcVal2">0%</div>
+        <div class="hfc-sub"><span class="hfc-dot" style="background:var(--orange)"></span>Exam qualifications</div>
+      </div>
+
+    </div><!-- /hero-right -->
+
+  </div><!-- /hero-inner -->
+
+  <!-- Scroll indicator — bounces via CSS animation (style.css §7) -->
+  <div class="scroll-hint">
+    <i class="fa fa-chevron-down"></i>
+    <span>Scroll to explore</span>
+  </div>
+</section><!-- /#hero -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     OVERLAP BRIDGE
+     4 stat cards that overlap between Hero and About.
+     Negative margin-top in CSS creates the layered depth effect.
+     Cards use .rev-up for scroll-triggered reveal (script.js §12).
+     Styled in style.css §8, §17.
+══════════════════════════════════════════════════════════ -->
+<div class="overlap-bridge">
+  <div class="bridge-inner">
+    <div class="bridge-card rev-up">
+      <div class="bc-icon teal"><i class="fa fa-shield-halved"></i></div>
+      <div><div class="bc-num">SSC</div><div class="bc-lbl">All Exams Covered</div></div>
+    </div>
+    <div class="bridge-card rev-up" style="transition-delay:.1s">
+      <div class="bc-icon orange"><i class="fa fa-map-location-dot"></i></div>
+      <div><div class="bc-num">WB</div><div class="bc-lbl">State & PSC Exams</div></div>
+    </div>
+    <div class="bridge-card rev-up" style="transition-delay:.2s">
+      <div class="bc-icon slate"><i class="fa fa-train"></i></div>
+      <div><div class="bc-num">RRB</div><div class="bc-lbl">Railway Exams</div></div>
+    </div>
+    <div class="bridge-card rev-up" style="transition-delay:.3s">
+      <div class="bc-icon teal"><i class="fa fa-brain"></i></div>
+      <div><div class="bc-num">3 Core</div><div class="bc-lbl">Maths · Reasoning · GK</div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     MOBILE OFFER WALL — visible ≤900px only
+     Sits between overlap-bridge and about section.
+     On desktop, the offer wall lives inside #hero (hfc-1 position).
+══════════════════════════════════════════════════════════ -->
+<div class="mob-offer-wall" id="mobOfferWall">
+  <div class="mow-inner">
+    <div class="mow-hdr">
+      <span class="ow-pulse"></span>
+      <span>Offers &amp; Notices</span>
+      <span class="ow-live">LIVE</span>
+    </div>
+    <div class="mow-track-outer">
+      <div class="mow-track" id="mowTrack">
+        <div class="mow-card ow-offer"><span>🔥</span><div><strong>Diwali Special</strong><p>30% OFF on all courses!</p></div></div>
+        <div class="mow-card ow-notice"><span>📢</span><div><strong>New Batch — 1 Feb</strong><p>SSC CGL batches starting</p></div></div>
+        <div class="mow-card ow-price"><span>💰</span><div><strong>SSC Full Package</strong><p>₹2,999/mo · ₹7,499/3mo</p></div></div>
+        <div class="mow-card ow-notice"><span>⏰</span><div><strong>Timings</strong><p>7AM–9AM &amp; 6PM–8PM</p></div></div>
+        <div class="mow-card ow-offer"><span>🎯</span><div><strong>Free Mock Test</strong><p>Every Sunday 10AM</p></div></div>
+        <div class="mow-card ow-price"><span>📚</span><div><strong>WB State Exams</strong><p>₹1,999/mo · WBP · WBPSC</p></div></div>
+        <div class="mow-card ow-notice"><span>🏆</span><div><strong>42 Students</strong><p>Cleared SSC CGL 2024!</p></div></div>
+        <div class="mow-card ow-price"><span>🚆</span><div><strong>Railway &amp; Banking</strong><p>₹1,499/mo · RRB NTPC</p></div></div>
+      </div>
+    </div>
+    <a href="#contact" class="ow-cta mow-cta">Enroll &amp; Claim Offer →</a>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 2 — ABOUT
+     Educator biography with drag-to-advance 3D slider (left)
+     and vertical timeline (right).
+     • #about-particles canvas — particle system (script.js §23)
+     • #aboutSlider / #adsStage — 3D depth slider (script.js §7)
+     • .tl-list — timeline entries (styled in style.css §9)
+     Styled in style.css §9.
+══════════════════════════════════════════════════════════ -->
+<section id="about">
+  <!-- Section particle canvas — animated by script.js §23 -->
+  <canvas class="sec-particles" id="about-particles"></canvas>
+
+  <div class="about-inner">
+
+    <!-- ── LEFT — 3D Depth Slider ── -->
+    <div class="about-left">
+      <div class="about-depth-slider" id="aboutSlider">
+        <div class="ads-stage" id="adsStage">
+          <div class="ads-slide" data-pos="0" style="background-image:url('assets/about-left-slide1.jpg');">
+            <div class="ads-inner-content">
+              <div class="hc-slide-icon" style="width:44px;height:44px;border-radius:12px;font-size:1.1rem;"><i class="fa fa-star"></i></div>
+              <h4>Avijit Samanta</h4>
+              <p>Competitive Exam Specialist &amp; Founder, PCC</p>
+            </div>
+          </div>
+          <div class="ads-slide" data-pos="1" style="background-image:url('assets/about-left-slide2.jpg');"></div>
+          <div class="ads-slide" data-pos="2" style="background-image:url('assets/about-left-slide3.jpg');"></div>
+          <div class="ads-slide" data-pos="3" style="background-image:url('assets/about-left-slide4.jpg');"></div>
+          <div class="ads-slide" data-pos="4" style="background-image:url('assets/about-left-slide5.jpg');"></div>
+          <div class="ads-slide" data-pos="4" style="background-image:url('assets/about-left-slide6.jpg');"></div>
+          <div class="ads-slide" data-pos="4" style="background-image:url('assets/about-left-slide7.jpg');"></div>
+          <div class="ads-slide" data-pos="4" style="background-image:url('assets/about-left-slide8.jpg');"></div>
+          <div class="ads-slide" data-pos="4" style="background-image:url('assets/about-left-slide9.jpg');"></div>
+        </div>
+        <!-- Orange badge — top-right corner -->
+        <div class="ads-badge">
+          <span class="big">10+</span>Years of<br/>Excellence
+        </div>
+        <!-- Drag hint — fades out via CSS animation (style.css §18) -->
+        <div class="ads-drag-hint"><i class="fa fa-hand-pointer"></i> Drag to explore</div>
+      </div>
+    </div><!-- /about-left -->
+
+    <!-- ── RIGHT — Story + Timeline ── -->
+    <div>
+      <div class="sec-label reveal">Journey</div>
+      <h2 class="sec-title reveal">The Story Behind <span>Progressive Class</span></h2>
+      <p class="sec-sub reveal" style="margin-bottom:2.5rem;">A passionate educator who turned a teaching dream into a transformative coaching institution — guiding thousands to government jobs across West Bengal.</p>
+
+      <!-- Vertical timeline — each entry revealed by IntersectionObserver (script.js §12) -->
+      <div class="tl-list">
+        <div class="tl-entry reveal" style="transition-delay:.05s">
+          <div class="tl-spine"><div class="tl-node"><i class="fa fa-graduation-cap" style="font-size:.75rem;"></i></div><div class="tl-line"></div></div>
+          <div class="tl-body"><div class="tl-yr">2010</div><h4>Academic Foundation</h4><p>Completed graduation with distinction in Mathematics. Developed a passion for analytical problem-solving and student-focused teaching.</p></div>
+        </div>
+        <div class="tl-entry reveal" style="transition-delay:.1s">
+          <div class="tl-spine"><div class="tl-node" style="border-color:var(--orange);color:var(--orange);background:var(--orange-pale);"><i class="fa fa-chalkboard" style="font-size:.75rem;"></i></div><div class="tl-line"></div></div>
+          <div class="tl-body"><div class="tl-yr">2013</div><h4>Teaching Career Begins</h4><p>Started coaching aspirants for competitive exams. Gained rapid recognition for simplifying complex topics with exam-focused strategies.</p></div>
+        </div>
+        <div class="tl-entry reveal" style="transition-delay:.15s">
+          <div class="tl-spine"><div class="tl-node"><i class="fa fa-trophy" style="font-size:.75rem;"></i></div><div class="tl-line"></div></div>
+          <div class="tl-body"><div class="tl-yr">2016</div><h4>100+ Govt. Selections</h4><p>Students began clearing SSC, WBP and State exams at remarkable rates, validating the unique teaching methodology.</p></div>
+        </div>
+        <div class="tl-entry reveal" style="transition-delay:.2s">
+          <div class="tl-spine"><div class="tl-node" style="border-color:var(--orange);color:var(--orange);background:var(--orange-pale);"><i class="fa fa-building" style="font-size:.75rem;"></i></div><div class="tl-line"></div></div>
+          <div class="tl-body"><div class="tl-yr">2019</div><h4>PCC Founded Officially</h4><p>Launched Progressive Competitive Class with structured curriculum, dedicated batches, and comprehensive study materials.</p></div>
+        </div>
+        <div class="tl-entry reveal" style="transition-delay:.25s">
+          <div class="tl-spine"><div class="tl-node"><i class="fa fa-star" style="font-size:.75rem;"></i></div></div>
+          <div class="tl-body"><div class="tl-yr">Today</div><h4>1000+ Students Strong</h4><p>PCC is now one of the most trusted coaching institutes in West Bengal — online, offline, and hybrid — with 500+ government selections.</p></div>
+        </div>
+      </div><!-- /tl-list -->
+    </div>
+
+  </div><!-- /about-inner -->
+</section><!-- /#about -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 3 — COURSES
+     6-card grid. Background uses "Pattern A" diagonal split
+     (dark navy top → diagonal edge → light base).
+     Featured SSC card has solid teal gradient; others are white.
+     Styled in style.css §10.
+══════════════════════════════════════════════════════════ -->
+<section id="courses">
+  <canvas class="sec-particles" id="courses-particles"></canvas>
+  <div class="courses-inner">
+    <div class="courses-head">
+      <div class="sec-label reveal">What We Offer</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;">
+        <h2 class="sec-title reveal" style="margin:0;">Courses &amp; <span>Exams Covered</span></h2>
+        <p class="sec-sub reveal" style="max-width:380px;margin:0;">Structured modules for every major government exam — from entry-level to officer-grade.</p>
+      </div>
+    </div>
+
+    <!-- ══ ROW 1: EXAM PROGRAMMES — auto-slide (translateX) ══ -->
+    <div class="cs-row reveal">
+      <div class="cs-rowlabel">
+        <span class="cs-rowtag"><i class="fa fa-shield-halved"></i> Exam Programmes</span>
+      </div>
+      <div class="cs-slider-area">
+        <button class="cs-navbtn cs-navbtn-side" id="csPrev1" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
+        <div class="cs-viewport" id="csVp1">
+          <div class="cs-track" id="csTrk1">
+            <div class="course-card featured" style="--cc-top:var(--teal)">
+              <div class="cc-icon"><i class="fa fa-shield-halved"></i></div>
+              <h3>SSC Exams — Full Package</h3>
+              <p>Our flagship programme covering all SSC examinations with previous year analysis and mock tests.</p>
+              <div class="tag-list"><span class="tag">CGL</span><span class="tag">CHSL</span><span class="tag">MTS</span><span class="tag">CPO</span><span class="tag">GD Constable</span></div>
+            </div>
+            <div class="course-card" style="--cc-top:var(--orange)">
+              <div class="cc-icon" style="background:var(--orange-pale);color:var(--orange)"><i class="fa fa-map-location-dot"></i></div>
+              <h3>WB State Exams</h3>
+              <p>Targeted state-level prep with Bengal-specific GK, syllabus alignment, and expert strategies for police and government posts.</p>
+              <div class="tag-list"><span class="tag hot">Group-C</span><span class="tag hot">Group-D</span><span class="tag hot">WBP</span><span class="tag hot">KP</span><span class="tag hot">SLST</span></div>
+            </div>
+            <div class="course-card" style="--cc-top:var(--teal)">
+              <div class="cc-icon"><i class="fa fa-scale-balanced"></i></div>
+              <h3>PSC Exams</h3>
+              <p>Public Service Commission preparation with in-depth GS, aptitude, and subject-specific modules for all PSC grade levels.</p>
+              <div class="tag-list"><span class="tag accent">Clerkship</span><span class="tag accent">MISC Services</span><span class="tag accent">Food SI</span></div>
+            </div>
+            <div class="course-card" style="--cc-top:#0284c7">
+              <div class="cc-icon" style="background:#e0f2fe;color:#0284c7"><i class="fa fa-train"></i></div>
+              <h3>Railway &amp; Banking</h3>
+              <p>Specialized coaching for RRB exams with quantitative aptitude, reasoning, and general awareness intensive programmes.</p>
+              <div class="tag-list"><span class="tag">RRB NTPC</span><span class="tag">ALP</span><span class="tag">Group D</span></div>
+            </div>
+          </div>
+        </div>
+        <button class="cs-navbtn cs-navbtn-side" id="csNext1" aria-label="Next"><i class="fa fa-chevron-right"></i></button>
+      </div>
+      <div class="cs-dots" id="csDots1"></div>
+    </div>
+
+    <!-- ══ ROW 2: SUBJECT MODULES — fade-zoom transition ══ -->
+    <div class="cs-row cs-row2 reveal" style="transition-delay:.15s">
+      <div class="cs-rowlabel">
+        <span class="cs-rowtag"><i class="fa fa-brain"></i> Subject Modules &amp; Support</span>
+      </div>
+      <div class="cs-slider-area">
+        <button class="cs-navbtn cs-navbtn-side" id="csPrev2" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
+        <div class="cs-viewport cs-vpfade" id="csVp2">
+          <div class="cs-track" id="csTrk2">
+            <div class="course-card" style="--cc-top:var(--orange)">
+              <div class="cc-icon" style="background:var(--orange-pale);color:var(--orange)"><i class="fa fa-calculator"></i></div>
+              <h3>Mathematics &amp; Reasoning Module</h3>
+              <p>Comprehensive maths from arithmetic to advanced DI — each concept explained with shortcuts and exam-ready techniques.</p>
+              <div class="tag-list"><span class="tag hot">Arithmetic</span><span class="tag hot">Algebra</span><span class="tag hot">Data Interpretation</span><span class="tag hot">Geometry</span></div>
+            </div>
+            <div class="course-card" style="--cc-top:#7c3aed">
+              <div class="cc-icon" style="background:#f3e8ff;color:#7c3aed"><i class="fa fa-brain"></i></div>
+              <h3>GK Support</h3>
+              <p>Current affairs and static GK — covering every section that decides your rank in any government exam.</p>
+              <div class="tag-list"><span class="tag">Verbal</span><span class="tag">Non-Verbal</span><span class="tag">Current Affairs</span><span class="tag">Static GK</span></div>
+            </div>
+            <div class="course-card" style="--cc-top:var(--teal)">
+              <div class="cc-icon" style="background:var(--teal-pale);color:var(--teal)"><i class="fa fa-clipboard-check"></i></div>
+              <h3>Weekly Mock <span style="font-weight:400;color:var(--orange);font-size:.88rem;">(GK · Math · Reasoning)</span></h3>
+              <p>Full-length mock every week covering all three subjects — timed, evaluated and ranked for competitive readiness.</p>
+              <div class="tag-list"><span class="tag accent">Every Sunday</span><span class="tag accent">Full Analysis</span><span class="tag accent">Rank List</span></div>
+            </div>
+            <div class="course-card" style="--cc-top:var(--orange)">
+              <div class="cc-icon" style="background:var(--orange-pale);color:var(--orange)"><i class="fa fa-calendar-days"></i></div>
+              <h3>Monthly CA Support</h3>
+              <p>Curated current affairs PDF delivered every month to all enrolled students — completely free of charge.</p>
+              <div class="tag-list"><span class="tag hot">FREE PDF</span><span class="tag hot">National</span><span class="tag hot">State Level</span><span class="tag hot">Economy</span></div>
+            </div>
+          </div>
+        </div>
+        <button class="cs-navbtn cs-navbtn-side" id="csNext2" aria-label="Next"><i class="fa fa-chevron-right"></i></button>
+      </div>
+      <div class="cs-dots cs-dots2" id="csDots2"></div>
+    </div>
+  </div>
+</section><!-- /#courses -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 4 — WHY CHOOSE US
+     Features grid + stats band.
+     "Pattern B" diagonal split (inverted direction vs courses).
+     Stats band numbers animated by script.js §13.
+     Feature cards use .reveal for scroll animations (script.js §12).
+     Styled in style.css §11.
+══════════════════════════════════════════════════════════ -->
+<section id="why">
+  <canvas class="sec-particles" id="why-particles"></canvas>
+  <div class="why-inner">
+
+    <div class="why-head">
+      <div class="sec-label reveal">Our Edge</div>
+      <h2 class="sec-title reveal" style="margin:0 auto 1rem;">Why <span>Students Choose</span> <span class="hi">PCC?</span></h2>
+      <p class="sec-sub reveal" style="margin:0 auto;">Results-driven teaching, proven methodology, and a relentless focus on your success.</p>
+    </div>
+
+    <!-- Stats band — numbers count from 0 to target when in viewport
+         data-target: final value | data-suf: suffix (+, %) -->
+    <div class="stats-band">
+      <div class="stat-item reveal"><div class="stat-num" data-target="1000" data-suf="+">0</div><div class="stat-lbl">Students Trained</div></div>
+      <div class="stat-item reveal" style="transition-delay:.1s"><div class="stat-num" data-target="95" data-suf="%">0</div><div class="stat-lbl">Success Rate</div></div>
+      <div class="stat-item reveal" style="transition-delay:.2s"><div class="stat-num" data-target="10" data-suf="+">0</div><div class="stat-lbl">Years Teaching</div></div>
+      <div class="stat-item reveal" style="transition-delay:.3s"><div class="stat-num" data-target="500" data-suf="+">0</div><div class="stat-lbl">Govt. Selections</div></div>
+      <div class="stat-item reveal" style="transition-delay:.4s"><div class="stat-num" data-target="50" data-suf="+">0</div><div class="stat-lbl">Free PDF Resources</div></div>
+    </div>
+
+    <!-- 6 feature cards — desktop: 3-col grid  |  mobile: swipe slider (script.js §new) -->
+    <div class="feat-wrap">
+      <div class="features-grid" id="featGrid">
+        <div class="feat-card reveal">
+          <div class="feat-num">01</div>
+          <div class="feat-icon"><i class="fa fa-bullseye"></i></div>
+          <h4>Exam-Focused Strategy</h4>
+          <p>Every class is built around what actually appears in the exam. Syllabus-aligned content with previous year analysis.</p>
+        </div>
+        <div class="feat-card reveal" style="transition-delay:.1s">
+          <div class="feat-num">02</div>
+          <div class="feat-icon"><i class="fa fa-clock"></i></div>
+          <h4>Weekly Mock Tests</h4>
+          <p>Regular full-length and sectional tests to continuously measure progress and build exam-day confidence.</p>
+        </div>
+        <div class="feat-card reveal" style="transition-delay:.2s">
+          <div class="feat-num">03</div>
+          <div class="feat-icon"><i class="fa fa-file-pdf"></i></div>
+          <h4>Free PDF Resources</h4>
+          <p>50+ curated notes, formula sheets, and question banks — available to every enrolled student at no cost.</p>
+        </div>
+        <div class="feat-card reveal" style="transition-delay:.3s">
+          <div class="feat-num">04</div>
+          <div class="feat-icon"><i class="fa fa-users-gear"></i></div>
+          <h4>Small Batch Sizes</h4>
+          <p>Limited seats per batch ensure every student gets individual attention, personal feedback, and focused guidance.</p>
+        </div>
+        <div class="feat-card reveal" style="transition-delay:.4s">
+          <div class="feat-num">05</div>
+          <div class="feat-icon"><i class="fa fa-laptop"></i></div>
+          <h4>Online + Offline Hybrid</h4>
+          <p>Attend in class or access recorded sessions online — flexible learning designed for every kind of student.</p>
+        </div>
+        <div class="feat-card reveal" style="transition-delay:.5s">
+          <div class="feat-num">06</div>
+          <div class="feat-icon"><i class="fa fa-comments"></i></div>
+          <h4>Dedicated Doubt Sessions</h4>
+          <p>Scheduled doubt-clearing sessions so no concept remains unclear before you step into the exam hall.</p>
+        </div>
+      </div>
+      <!-- Mobile-only slider nav (hidden on desktop via CSS) -->
+      <div class="feat-slidernav" id="featSliderNav">
+        <button class="feat-snbtn" id="featPrev"><i class="fa fa-chevron-left"></i></button>
+        <div class="feat-sndots" id="featDots"></div>
+        <button class="feat-snbtn" id="featNext"><i class="fa fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+  </div>
+</section><!-- /#why -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 5 — PDF RESOURCES
+     4-card download grid.
+     Same "Pattern A" diagonal split as Courses.
+     #pdfs-glow follows mouse — driven by script.js §9.
+     Styled in style.css §12.
+══════════════════════════════════════════════════════════ -->
+<section id="pdfs">
+  <canvas class="sec-particles" id="pdfs-particles"></canvas>
+  <!-- Glow div — position set by mousemove in script.js §9 -->
+  <div id="pdfs-glow"></div>
+
+  <div class="pdfs-inner">
+    <div class="pdfs-head">
+      <div class="sec-label reveal">Free Resources</div>
+      <h2 class="sec-title reveal">Sample <span>Study Materials</span></h2>
+      <p class="sec-sub reveal">Premium-quality PDFs crafted by Avijit Samanta for targeted, exam-ready preparation.</p>
+    </div>
+
+    <!-- PDF cards — .pdf-thumb colour coded by t1–t4 classes (style.css §12) -->
+    <div class="pdfs-grid">
+      <div class="pdf-card reveal">
+        <div class="pdf-thumb t1"><div class="pdf-thumb-icon"><i class="fa fa-file-pdf"></i></div></div>
+        <div class="pdf-body"><h4>SSC CGL — Maths Formula Sheet</h4><p>All key formulas for CGL Tier 1 &amp; 2 compiled with worked examples.</p>
+         <div class="pdf-btns"> <a href="assets/your-pdf-1.pdf" class="pdf-dl" download><i class="fa fa-download"></i> Download</a>
+          <a href="assets/your-pdf-1.pdf" class="pdf-dl" target="_blank"><i class="fa fa-eye"></i> Preview</a> </div>
+        </div>
+      </div>
+      <div class="pdf-card reveal" style="transition-delay:.1s">
+        <div class="pdf-thumb t2"><div class="pdf-thumb-icon"><i class="fa fa-brain"></i></div></div>
+        <div class="pdf-body"><h4>Reasoning — 500 Practice Questions</h4><p>Verbal and non-verbal questions with step-by-step solutions and shortcuts.</p>
+          <div class="pdf-btns"> <a href="assets/your-pdf-2.pdf" class="pdf-dl" style="color:var(--orange);border-color:var(--orange)" download><i class="fa fa-download"></i> Download</a>
+          <a href="assets/your-pdf-2.pdf" class="pdf-dl" style="color:var(--orange);border-color:var(--orange)" target="_blank"><i class="fa fa-eye"></i> Preview</a> </div>
+        </div>
+      </div>
+      <div class="pdf-card reveal" style="transition-delay:.2s">
+        <div class="pdf-thumb t3"><div class="pdf-thumb-icon"><i class="fa fa-globe"></i></div></div>
+        <div class="pdf-body"><h4>GK — WB State Exam Special</h4><p>Bengal-specific GK notes covering WBP, WBPSC and SSC Group-C/D syllabus.</p>
+          <div class="pdf-btns"> <a href="assets/your-pdf-3.pdf" class="pdf-dl" style="color:#0284c7;border-color:#0284c7" download><i class="fa fa-download"></i> Download</a>
+          <a href="assets/your-pdf-3.pdf" class="pdf-dl" style="color:#0284c7;border-color:#0284c7" target="_blank"><i class="fa fa-eye"></i> Preview</a> </div>
+        </div>
+      </div>
+      <div class="pdf-card reveal" style="transition-delay:.3s">
+        <div class="pdf-thumb t4"><div class="pdf-thumb-icon"><i class="fa fa-chart-bar"></i></div></div>
+        <div class="pdf-body"><h4>DI — Data Interpretation Workbook</h4><p>30 full DI sets with tables, graphs, and pie charts for SSC CGL &amp; RRB.</p>
+          <div class="pdf-btns"> <a href="assets/your-pdf-4.pdf" class="pdf-dl" style="color:#7c3aed;border-color:#7c3aed" download><i class="fa fa-download"></i> Download</a>
+          <a href="assets/your-pdf-4.pdf" class="pdf-dl" style="color:#7c3aed;border-color:#7c3aed" target="_blank"><i class="fa fa-eye"></i> Preview</a> </div>
+        </div>
+      </div>
+      <div class="pdf-card reveal" style="transition-delay:.4s">
+        <div class="pdf-thumb t5"><div class="pdf-thumb-icon"><i class="fa fa-square-root-variable"></i></div></div>
+        <div class="pdf-body"><h4>Math Practice Sheet — 50 Questions</h4><p>50 handpicked practice problems across arithmetic, algebra and geometry with full solutions.</p>
+          <div class="pdf-btns"> <a href="assets/your-pdf-5.pdf" class="pdf-dl" style="color:var(--orange);border-color:var(--orange)" download><i class="fa fa-download"></i> Download</a>
+          <a href="assets/your-pdf-5.pdf" class="pdf-dl" style="color:var(--orange);border-color:var(--orange)" target="_blank"><i class="fa fa-eye"></i> Preview</a> </div>
+        </div>
+      </div>
+      <div class="pdf-card reveal" style="transition-delay:.5s">
+        <div class="pdf-thumb t6"><div class="pdf-thumb-icon"><i class="fa fa-wand-magic-sparkles"></i></div></div>
+        <div class="pdf-body"><h4>Math Short Tricks</h4><p>Speed maths shortcuts and Vedic tricks to solve complex problems in under 30 seconds.</p>
+          <div class="pdf-btns"> <a href="assets/your-pdf-6.pdf" class="pdf-dl" download><i class="fa fa-download"></i> Download</a>
+          <a href="assets/your-pdf-6.pdf" class="pdf-dl" target="_blank"><i class="fa fa-eye"></i> Preview</a> </div>
+        </div>
+      </div>
+      <div class="pdf-card reveal" style="transition-delay:.6s">
+        <div class="pdf-thumb t7"><div class="pdf-thumb-icon"><i class="fa fa-globe-asia"></i></div></div>
+        <div class="pdf-body"><h4>SSC Special GK</h4><p>Hand-curated SSC-specific GK notes — History, Geography, Polity and Science in one place.</p>
+          <div class="pdf-btns"> <a href="assets/your-pdf-7.pdf" class="pdf-dl" style="color:#0284c7;border-color:#0284c7" download><i class="fa fa-download"></i> Download</a>
+          <a href="assets/your-pdf-7.pdf" class="pdf-dl" style="color:#0284c7;border-color:#0284c7" target="_blank"><i class="fa fa-eye"></i> Preview</a> </div>
+        </div>
+      </div>
+      <div class="pdf-card reveal" style="transition-delay:.7s">
+        <div class="pdf-thumb t8"><div class="pdf-thumb-icon"><i class="fa fa-list-check"></i></div></div>
+        <div class="pdf-body"><h4>Solved Problems — 25</h4><p>25 fully worked exam-standard problems with step-by-step reasoning across all major topics.</p>
+          <div class="pdf-btns"> <a href="assets/your-pdf-8.pdf" class="pdf-dl" style="color:#7c3aed;border-color:#7c3aed" download><i class="fa fa-download"></i> Download</a>
+          <a href="assets/your-pdf-8.pdf" class="pdf-dl" style="color:#7c3aed;border-color:#7c3aed" target="_blank"><i class="fa fa-eye"></i> Preview</a> </div>
+        </div>
+      </div>
+    </div><!-- /pdfs-grid -->
+  </div>
+</section><!-- /#pdfs -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 6 — RATINGS & TESTIMONIALS
+     Contains:
+     • .rating-hero — dark summary card (score + bars + results)
+     • .t-slider / #ttrack — sliding testimonial cards (script.js §18)
+     • #prevB / #nextB — slider navigation buttons
+     • .review-form-wrap — review submission form (script.js §19, §20)
+     Styled in style.css §13.
+══════════════════════════════════════════════════════════ -->
+<section id="ratings">
+  <canvas class="sec-particles" id="ratings-particles"></canvas>
+  <div class="ratings-inner">
+
+    <div class="ratings-head">
+      <div class="sec-label reveal">Student Voice</div>
+      <h2 class="sec-title reveal">Reviews &amp; <span>Ratings</span></h2>
+    </div>
+
+    <!-- Rating summary block — dark card -->
+    <div class="rating-hero reveal">
+      <!-- Score and star icons -->
+      <div class="rh-score">
+        <div class="rh-big">4.9</div>
+        <div class="rh-stars">
+          <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+          <i class="fa fa-star"></i><i class="fa fa-star-half-stroke"></i>
+        </div>
+        <div class="rh-label">Based on 200+ reviews</div>
+      </div>
+      <!-- Distribution bars — widths set inline as percentages -->
+      <div class="rh-bars">
+        <div class="rbar"><span class="rbar-lbl">5 ★</span><div class="rbar-track"><div class="rbar-fill" style="width:82%"></div></div><span class="rbar-cnt">164</span></div>
+        <div class="rbar"><span class="rbar-lbl">4 ★</span><div class="rbar-track"><div class="rbar-fill" style="width:12%"></div></div><span class="rbar-cnt">24</span></div>
+        <div class="rbar"><span class="rbar-lbl">3 ★</span><div class="rbar-track"><div class="rbar-fill" style="width:4%"></div></div><span class="rbar-cnt">8</span></div>
+        <div class="rbar"><span class="rbar-lbl">2 ★</span><div class="rbar-track"><div class="rbar-fill" style="width:2%"></div></div><span class="rbar-cnt">4</span></div>
+        <div class="rbar"><span class="rbar-lbl">1 ★</span><div class="rbar-track"><div class="rbar-fill" style="width:0%"></div></div><span class="rbar-cnt">0</span></div>
+      </div>
+      <!-- Results breakdown list -->
+      <div class="rh-results">
+        <div class="rhr-title">Exam Results</div>
+        <div class="rhr-item"><span>SSC Selections</span><strong>200+</strong></div>
+        <div class="rhr-item"><span>WBP Selections</span><strong>150+</strong></div>
+        <div class="rhr-item"><span>PSC Selections</span><strong>80+</strong></div>
+        <div class="rhr-item"><span>Railways</span><strong>70+</strong></div>
+      </div>
+    </div><!-- /rating-hero -->
+
+    <!-- Testimonials slider — driven by script.js §18 -->
+    <div class="t-slider">
+      <div class="t-track" id="ttrack">
+        <div class="t-card">
+          <div class="qm">"</div>
+          <p class="t-txt">Avijit Sir's teaching is extraordinary. He breaks down complex maths problems into simple steps. I cleared SSC CGL Tier 1 in my very first attempt after joining PCC.</p>
+          <div class="t-author"><div class="t-av">R</div><div><div class="t-name">Rahul Das</div><div class="t-meta">SSC CGL 2023 Qualifier</div><div class="t-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></div></div></div>
+        </div>
+        <div class="t-card">
+          <div class="qm">"</div>
+          <p class="t-txt">PCC gave me the right direction for WBP SI exam. The mock test series and GK materials were exactly what the exam required. Highly recommended for every aspirant!</p>
+          <div class="t-author"><div class="t-av" style="background:linear-gradient(135deg,var(--orange),#d9620e)">P</div><div><div class="t-name">Priya Mondal</div><div class="t-meta">WBP Sub-Inspector 2022</div><div class="t-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></div></div></div>
+        </div>
+        <div class="t-card">
+          <div class="qm">"</div>
+          <p class="t-txt">The reasoning sessions are the best I've ever attended. Sir explains every concept with clarity that makes even the toughest puzzles feel easy. Cracked CHSL!</p>
+          <div class="t-author"><div class="t-av" style="background:linear-gradient(135deg,#0284c7,#0a6e68)">S</div><div><div class="t-name">Suman Ghosh</div><div class="t-meta">SSC CHSL 2023 Selected</div><div class="t-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></div></div></div>
+        </div>
+        <div class="t-card">
+          <div class="qm">"</div>
+          <p class="t-txt">From a scared aspirant to a government employee — PCC transformed my journey. The PDF notes are well-structured and the personal attention made all the difference.</p>
+          <div class="t-author"><div class="t-av" style="background:linear-gradient(135deg,var(--teal),#7c3aed)">A</div><div><div class="t-name">Arnab Pal</div><div class="t-meta">WBPSC Clerkship 2023</div><div class="t-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-stroke"></i></div></div></div>
+        </div>
+        <div class="t-card">
+          <div class="qm">"</div>
+          <p class="t-txt">Best investment of my career. Small batch size means Sir gives personal attention to each student. My maths score jumped from 40% to 85% in just 3 months!</p>
+          <div class="t-author"><div class="t-av" style="background:linear-gradient(135deg,#7c3aed,var(--orange))">M</div><div><div class="t-name">Moumita Dey</div><div class="t-meta">RRB NTPC 2023 Selected</div><div class="t-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></div></div></div>
+        </div>
+      </div><!-- /t-track -->
+      <!-- Slider navigation buttons — wired in script.js §18 -->
+      <div class="slider-nav">
+        <button class="s-btn" id="prevB"><i class="fa fa-chevron-left"></i></button>
+        <button class="s-btn" id="nextB"><i class="fa fa-chevron-right"></i></button>
+      </div>
+    </div><!-- /t-slider -->
+
+    <!-- Live reviews injected here by script.js when user submits -->
+    <div class="live-rv-wrap" id="liveRvWrap" style="display:none">
+      <div class="live-rv-hdr"><span class="ow-pulse"></span><span>New Reviews — Just Added</span></div>
+      <div class="live-rv-list" id="liveRvList"></div>
+    </div>
+
+    <!-- Review submission form
+         Star picker: script.js §19 | Submit: script.js §20 -->
+    <div class="review-form-wrap reveal">
+      <h3><i class="fa fa-pen-nib" style="margin-right:.5rem;color:var(--teal);"></i>Share Your Experience</h3>
+      <!-- Star picker — .on class toggled by script.js §19 -->
+      <div class="star-pick" id="starPick">
+        <span class="sp" data-v="1">★</span><span class="sp" data-v="2">★</span>
+        <span class="sp" data-v="3">★</span><span class="sp" data-v="4">★</span><span class="sp" data-v="5">★</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div class="f-group"><input type="text" placeholder=" " id="rv_name"/><label>Your Name</label></div>
+        <div class="f-group"><input type="text" placeholder=" " id="rv_exam"/><label>Exam Cleared</label></div>
+      </div>
+      <div class="f-group" style="margin-bottom:1rem;"><textarea placeholder=" " id="rv_msg" style="min-height:80px;"></textarea><label>Your Feedback</label></div>
+      <!-- Submit — calls submitReview() in script.js §20 -->
+      <button class="btn-primary" style="cursor:none;" onclick="submitReview()"><i class="fa fa-paper-plane"></i> Submit Review</button>
+      <!-- Success message — shown/hidden by script.js §20 -->
+      <div class="f-success" id="rvOk"><i class="fa fa-circle-check"></i> Thank you! Your review has been submitted.</div>
+    </div>
+
+  </div><!-- /ratings-inner -->
+</section><!-- /#ratings -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 7 — CONTACT
+     Two-panel grid: enquiry form (left) + contact info (right).
+     Form submit: script.js §21 (hSubmit).
+     ⚠️  Replace form with actual backend (Formspree/EmailJS) for production.
+     Styled in style.css §14.
+══════════════════════════════════════════════════════════ -->
+<section id="contact">
+  <canvas class="sec-particles" id="contact-particles"></canvas>
+  <div class="contact-inner">
+    <div class="contact-head">
+      <div class="sec-label reveal">Get In Touch</div>
+      <h2 class="sec-title reveal">Enroll &amp; <span style="color:var(--teal-light)">Start Today</span></h2>
+      <p class="sec-sub reveal">Take the first step towards your government job — fill in the form or reach out directly to join PCC.</p>
+    </div>
+
+    <div class="contact-grid">
+
+      <!-- ── ENQUIRY FORM — onsubmit calls hSubmit(event) in script.js §21 ── -->
+      <div class="c-panel reveal">
+        <h3><i class="fa fa-envelope-open-text" style="margin-right:.5rem;color:var(--teal)"></i>Send Enquiry</h3>
+        <form onsubmit="hSubmit(event)">
+          <div class="f-group"><input type="text" placeholder=" " name="name" required/><label>Full Name</label></div>
+          <div class="f-group"><input type="tel" placeholder=" " name="phone" required/><label>Phone Number</label></div>
+          <div class="f-group"><input type="email" placeholder=" " name="email"/><label>Email (optional)</label></div>
+          <div class="f-group">
+            <select name="course">
+              <option value="" disabled selected>Select Course / Exam</option>
+              <option>SSC CGL</option><option>SSC CHSL</option><option>SSC MTS / GD</option>
+              <option>WBP / KP</option><option>WBPSC</option>
+              <option>SSC Group-C / Group-D</option><option>RRB NTPC</option><option>Other</option>
+            </select>
+          </div>
+          <div class="f-group"><textarea placeholder=" " name="message"></textarea><label>Your Message</label></div>
+          <button type="submit" class="btn-orange" style="width:100%;cursor:none;justify-content:center;"><i class="fa fa-paper-plane"></i> Send Enquiry</button>
+          <!-- Success message — toggled by script.js §21 -->
+          <div class="f-success" id="cOk"><i class="fa fa-circle-check"></i> Enquiry sent! We'll contact you shortly.</div>
+        </form>
+      </div>
+
+      <!-- ── CONTACT INFO PANEL ── -->
+      <div class="c-panel reveal" style="transition-delay:.15s">
+        <h3><i class="fa fa-address-card" style="margin-right:.5rem;color:var(--teal)"></i>Contact Information</h3>
+        <div class="ci-items">
+          <!-- ⚠️ Update phone number -->
+          <div class="ci-row"><div class="ci-ico"><i class="fa fa-phone"></i></div><div class="ci-text"><span>Phone / WhatsApp</span><strong>+91 XXXXX XXXXX (Update Number)</strong></div></div>
+          <!-- ⚠️ Update email address -->
+          <div class="ci-row"><div class="ci-ico orange"><i class="fa fa-envelope"></i></div><div class="ci-text"><span>Email</span><strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="750516165b14031c1f1c01351218141c195b161a18">[email&#160;protected]</a> (Update Email)</strong></div></div>
+          <div class="ci-row"><div class="ci-ico"><i class="fa fa-location-dot"></i></div><div class="ci-text"><span>Location</span><strong>Progressive Competitive Class, Asansol, West Bengal</strong></div></div>
+          <div class="ci-row"><div class="ci-ico orange"><i class="fa fa-clock"></i></div><div class="ci-text"><span>Hours</span><strong>Monday – Saturday: 7:00 AM – 9:00 PM</strong></div></div>
+        </div>
+        <!-- ⚠️ Replace .map-box with actual Google Maps iframe -->
+        <div class="map-box">
+          <i class="fa fa-map-location-dot"></i>
+          <div>Google Map will appear here.<br/><small>Paste your Google Maps &lt;iframe&gt; to replace this block.</small></div>
+        </div>
+        <!-- ⚠️ Update social media hrefs -->
+        <div class="soc-row">
+          <a href="#" class="soc-b" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" class="soc-b" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="soc-b" title="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" class="soc-b" title="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="soc-b" title="Telegram"><i class="fab fa-telegram"></i></a>
+        </div>
+      </div>
+
+    </div><!-- /contact-grid -->
+  </div>
+</section><!-- /#contact -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     FOOTER
+     3-column link grid + brand block + social icons.
+     Top gradient line and bottom-right ambient glow via CSS pseudo-elements.
+     ⚠️ Update social hrefs + agency name + copyright year.
+     Styled in style.css §15.
+══════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <!-- Brand block -->
+      <div class="footer-brand">
+        <div class="footer-logo"><div class="dot"></div>PROGRESSIVE<span>&nbsp;COMPETITIVE&nbsp;</span>CLASSES</div>
+        <p>Premier coaching for SSC, State &amp; PSC competitive exams guided by Avijit Samanta — transforming aspirants into government officers since 2013.</p>
+        <div class="footer-soc">
+          <a href="#" class="soc-b" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" class="soc-b" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="soc-b" title="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" class="soc-b" title="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="soc-b" title="Telegram"><i class="fab fa-telegram"></i></a>
+        </div>
+      </div>
+
+      <!-- 3-column link grid -->
+      <div class="footer-cols-group">
+        <div class="f-col">
+          <h5>Quick Links</h5>
+          <ul>
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#about">About Sir</a></li>
+            <li><a href="#courses">Courses</a></li>
+            <li><a href="#why">Why PCC</a></li>
+            <li><a href="#pdfs">Resources</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+        <div class="f-col">
+          <h5>Exams Covered</h5>
+          <ul>
+            <li><a href="#courses">SSC CGL</a></li>
+            <li><a href="#courses">SSC CHSL</a></li>
+            <li><a href="#courses">WBP / KP</a></li>
+            <li><a href="#courses">WBPSC</a></li>
+            <li><a href="#courses">RRB NTPC</a></li>
+            <li><a href="#courses">SSC Group C &amp; D</a></li>
+          </ul>
+        </div>
+        <div class="f-col">
+          <h5>Our Support</h5>
+          <ul>
+            <li><a href="#courses">Mathematics</a></li>
+            <li><a href="#courses">Reasoning</a></li>
+            <li><a href="#courses">General Knowledge</a></li>
+            <li><a href="#courses">Current Affairs</a></li>
+            <li><a href="#pdfs">Free PDF Notes</a></li>
+            <li><a href="#ratings">Mock Tests</a></li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- /footer-top -->
+
+    <div class="footer-divider"></div>
+
+    <div class="footer-bottom">
+      <!-- ⚠️ Update copyright year -->
+      <p>© 2024 Progressive Competitive Class by Avijit Samanta. All Rights Reserved.</p>
+      <!-- ⚠️ Update agency name -->
+      <p class="agency-tag">Made with <i class="fa fa-heart" style="color:var(--orange);font-size:.8rem;"></i> by <span>[Your Agency Name]</span></p>
+    </div>
+  </div>
+</footer><!-- /footer -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     PROJECT JAVASCRIPT
+     Loaded at bottom of body so all DOM elements are available.
+     Contains 23 organised sections — see script.js for full docs.
+     Requires GSAP + ScrollTrigger + Three.js (loaded in <head> above).
+══════════════════════════════════════════════════════════ -->
+<script src="script.js"></script>
+
+</body>
+</html>
